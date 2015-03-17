@@ -24,13 +24,18 @@ namespace BackupRavenDB
 
         private static void Main(string[] args)
         {
-            logger = new LoggerConfiguration()
+            var logConfig = new LoggerConfiguration()
                 .Destructure.UsingAttributes()
                 .MinimumLevel.Debug()
                 .WriteTo.ColoredConsole()
-                .WriteTo.RollingFile(@"logs\{Date}.txt", LogEventLevel.Verbose)
-                .WriteTo.Logentries(AppSettings.LogEntriesToken)
-                .CreateLogger();
+                .WriteTo.RollingFile(@"logs\{Date}.txt", LogEventLevel.Verbose);
+
+            if (!string.IsNullOrWhiteSpace(AppSettings.LogEntriesToken))
+            {
+                logConfig = logConfig.WriteTo.Logentries(AppSettings.LogEntriesToken);
+            }
+
+            logger = logConfig.CreateLogger();
 
             Log.Logger = logger;
 
